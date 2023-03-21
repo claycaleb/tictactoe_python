@@ -1,10 +1,14 @@
 from random import choice
 import numpy as np
 from os import system, name
-from time import sleep
 
 
 def clear():
+    '''
+    Clears Command Prompt or Terminal screen.
+
+    :return: nothing
+    '''
     # For Windows
     if name == 'nt':
         _ = system('cls')
@@ -15,6 +19,11 @@ def clear():
 
 
 def board_setup():
+    '''
+    Sets game board indices for the user's Xs and Os.
+
+    :return: a list of indices to place the user's Xs and Os.
+    '''
     board = '''┏━━━━━┳━━━━━┳━━━━━┓
 ┃  x  ┃  x  ┃  x  ┃
 ┣━━━━━╋━━━━━╋━━━━━┫
@@ -34,17 +43,27 @@ def board_setup():
     return board_index_list
 
 
-def user_input(available_cells, player_cells):
-    return player_cell
-
-
 def select_spot(game_board, board_index, char):
+    '''
+    Overwrites the game board string to add the user's Xs and Os.
+
+    :param game_board: string of the game grid
+    :param board_index: character index that will be replaced with the user's X or O
+    :param char: X or O
+    :return: updated game board/grid
+    '''
     game_board = game_board[:board_index] + game_board[board_index:].replace(' ', f'{char}', 1)
 
     return game_board
 
 
 def check_win(cells):
+    '''
+    Cross-checks player or CPU cell list to see if they have won.
+
+    :param cells: a list of chosen cells
+    :return: a boolean - win
+    '''
     board_matrix = np.array([[1, 2, 3],
                              [4, 5, 6],
                              [7, 8, 9]])
@@ -58,6 +77,12 @@ def check_win(cells):
 
 
 def play_game():
+    '''
+    Main game function. User chooses X or O, then chooses their cells.
+    As of right now, the CPU chooses cells at random.
+
+    :return: nothing
+    '''
     board_index_list = board_setup()
 
     num_board = '''┏━━━━━┳━━━━━┳━━━━━┓
@@ -87,15 +112,19 @@ def play_game():
         player_char = input("X or O? ")
         cpu_char = char_choices.replace(player_char, "")
 
+    # These are used to check win-cases.
     player_cells = []
     cpu_cells = []
 
     available_cells = list(range(1, 10))
 
+    # Shows the user how the grid is laid out.
     print(num_board)
 
+    # Checks if the computer has won.
     while not check_win(cpu_cells):
 
+        # A loop used to make sure the user input is an integer.
         while True:
             try:
                 player_cell = int(input("Select a spot: "))
@@ -104,6 +133,7 @@ def play_game():
             except ValueError:
                 print("Invalid input. Try again.")
 
+        # Makes sure user is choosing an available cell. If not, they'll be prompted to try again.
         if player_cell in available_cells:
             player_cells.append(player_cell)
         while player_cell not in available_cells:
@@ -113,12 +143,14 @@ def play_game():
         game_board = select_spot(game_board, board_index_list[player_cell - 1], player_char)
         available_cells.remove(player_cell)
 
+        # User win case.
         if check_win(player_cells):
             clear()
             print(game_board)
             print("You win!\n")
             break
 
+        # Draw case.
         if len(available_cells) == 0:
             clear()
             print(game_board)
@@ -134,11 +166,13 @@ def play_game():
         clear()
         print(game_board)
 
+    # CPU win case.
     if check_win(cpu_cells):
         clear()
         print(game_board)
         print("You lose!\n")
 
+    # Play again feature
     play_again_choices = "yn"
     play_again = input("Play again? (Y/N) ")
     while play_again.lower() not in play_again_choices:
